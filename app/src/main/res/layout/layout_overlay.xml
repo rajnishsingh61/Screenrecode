@@ -4,6 +4,23 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
+    <!-- FPS Counter -->
+    <TextView
+        android:id="@+id/tvFps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/bg_glass_card"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="2dp"
+        android:text="60 FPS"
+        android:textColor="#00FF00"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/imgBubble"
+        app:layout_constraintEnd_toEndOf="@id/imgBubble"
+        app:layout_constraintStart_toStartOf="@id/imgBubble" />
+
     <!-- Floating Bubble -->
     <ImageView
         android:id="@+id/imgBubble"

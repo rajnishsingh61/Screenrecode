@@ -10,6 +10,8 @@ import android.view.*
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
+import android.graphics.Color
 
 class FloatingControlService : Service() {
 
@@ -17,11 +19,38 @@ class FloatingControlService : Service() {
     private var floatingView: View? = null
     private var isPaused = false
 
+    private var frameCount = 0
+    private var lastTime = 0L
+    private val choreographer = Choreographer.getInstance()
+    private val frameCallback = object : Choreographer.FrameCallback {
+        override fun doFrame(frameTimeNanos: Long) {
+            val currentTime = System.currentTimeMillis()
+            frameCount++
+
+            if (currentTime - lastTime >= 1000) {
+                val fps = frameCount
+                val tvFps = floatingView?.findViewById<TextView>(R.id.tvFps)
+                tvFps?.text = "$fps FPS"
+                tvFps?.setTextColor(when {
+                    fps >= 50 -> Color.GREEN
+                    fps >= 30 -> Color.YELLOW
+                    else -> Color.RED
+                })
+                
+                frameCount = 0
+                lastTime = currentTime
+            }
+            choreographer.postFrameCallback(this)
+        }
+    }
+
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
         super.onCreate()
         showFloatingController()
+        lastTime = System.currentTimeMillis()
+        choreographer.postFrameCallback(frameCallback)
     }
 
     private fun showFloatingController() {
@@ -108,6 +137,7 @@ class FloatingControlService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        choreographer.removeFrameCallback(frameCallback)
         if (floatingView != null) {
             windowManager?.removeView(floatingView)
         }

@@ -72,7 +72,7 @@ class ScreenRecordService : Service() {
         createNotificationChannel()
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("GAME RECORDING ACTIVE")
-            .setContentText("Capturing gameplay at peak performance")
+            .setContentText("Capturing gameplay with custom settings")
             .setSmallIcon(android.R.drawable.ic_media_play)
             .setOngoing(true)
             .setColor(0xB026FF)
@@ -87,13 +87,32 @@ class ScreenRecordService : Service() {
         val projectionManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
         mediaProjection = projectionManager.getMediaProjection(resultCode, data)
 
-        setupMediaRecorder()
+        val prefs = getSharedPreferences("GameRecSettings", Context.MODE_PRIVATE)
+        val targetRes = prefs.getString("resolution", "1080p") ?: "1080p"
+        val targetFps = prefs.getInt("fps", 60)
+        val targetBitrate = prefs.getInt("bitrate", 12 * 1024 * 1024)
+
+        val targetHeight = when(targetRes) {
+            "720p" -> 720
+            "1080p" -> 1080
+            "1440p" -> 1440
+            else -> 1080
+        }
+
+        val ratio = displayWidth.toFloat() / displayHeight.toFloat()
+        var recordHeight = targetHeight
+        var recordWidth = (targetHeight * ratio).toInt()
+        
+        if (recordWidth % 2 != 0) recordWidth--
+        if (recordHeight % 2 != 0) recordHeight--
+
+        setupMediaRecorder(recordWidth, recordHeight, targetFps, targetBitrate)
 
         try {
             mediaRecorder?.prepare()
             virtualDisplay = mediaProjection?.createVirtualDisplay(
                 "GameRec_Display",
-                displayWidth, displayHeight, screenDensity,
+                recordWidth, recordHeight, screenDensity,
                 DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
                 mediaRecorder?.surface, null, null
             )
@@ -107,7 +126,7 @@ class ScreenRecordService : Service() {
         }
     }
 
-    private fun setupMediaRecorder() {
+    private fun setupMediaRecorder(width: Int, height: Int, fps: Int, bitrate: Int) {
         mediaRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             MediaRecorder(this)
         } else {
@@ -122,9 +141,9 @@ class ScreenRecordService : Service() {
             setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
             setVideoEncoder(MediaRecorder.VideoEncoder.H264)
             setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-            setVideoEncodingBitRate(12 * 1024 * 1024)
-            setVideoFrameRate(60)
-            setVideoSize(displayWidth, displayHeight)
+            setVideoEncodingBitRate(bitrate)
+            setVideoFrameRate(fps)
+            setVideoSize(width, height)
             
             if (videoUri != null) {
                 val pfd = contentResolver.openFileDescriptor(videoUri, "rw")

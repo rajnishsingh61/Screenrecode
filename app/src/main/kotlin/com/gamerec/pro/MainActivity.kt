@@ -12,6 +12,8 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.provider.Settings
 import android.view.View
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -164,10 +166,20 @@ class MainActivity : AppCompatActivity() {
     private fun saveUserProfile(user: com.google.firebase.auth.FirebaseUser?) {
         user?.let {
             val docRef = db.collection("users").document(it.uid)
+            
+            // Real-time listener for premium status
+            docRef.addSnapshotListener { snapshot, e ->
+                if (e != null) return@addSnapshotListener
+                if (snapshot != null && snapshot.exists()) {
+                    isUserPremium = snapshot.getBoolean("isPremium") ?: false
+                    if (isUserPremium) {
+                        binding.tvAdBlockWarning.visibility = View.GONE
+                    }
+                }
+            }
+
             docRef.get().addOnSuccessListener { document ->
-                if (document.exists()) {
-                    isUserPremium = document.getBoolean("isPremium") ?: false
-                } else {
+                if (!document.exists()) {
                     val userMap = hashMapOf(
                         "uid" to it.uid,
                         "email" to it.email,
@@ -329,12 +341,86 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnNavSettings.setOnClickListener {
-            Toast.makeText(this, "Settings module coming soon!", Toast.LENGTH_SHORT).show()
+            showSettingsDialogue()
         }
 
         binding.btnAdminWeb.setOnClickListener {
             showError("Admin Panel is available at /web/admin in the web interface. Log in with singhrajnish52741@gmail.com to manage.")
         }
+    }
+
+    private fun showSettingsDialogue() {
+        val prefs = getSharedPreferences("GameRecSettings", Context.MODE_PRIVATE)
+        
+        val resolutions = arrayOf("720p", "1080p", "1440p")
+        val fpsOptions = arrayOf("30 FPS", "60 FPS", "90 FPS", "120 FPS")
+        val bitrates = arrayOf("4 Mbps", "8 Mbps", "12 Mbps", "20 Mbps", "32 Mbps")
+
+        var selectedRes = prefs.getInt("resolution_index", 1) // Default 1080p
+        var selectedFps = prefs.getInt("fps_index", 1) // Default 60 FPS
+        var selectedBitrate = prefs.getInt("bitrate_index", 2) // Default 12 Mbps
+
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(40, 20, 40, 20)
+        }
+
+        fun createLabel(text: String) = TextView(this).apply {
+            this.text = text
+            textSize = 14f
+            setPadding(0, 24, 0, 8)
+            setTextColor(ContextCompat.getColor(context, R.color.text_dark))
+        }
+
+        val resSpinner = android.widget.Spinner(this)
+        resSpinner.adapter = android.widget.ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, resolutions)
+        resSpinner.setSelection(selectedRes)
+
+        val fpsSpinner = android.widget.Spinner(this)
+        fpsSpinner.adapter = android.widget.ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, fpsOptions)
+        fpsSpinner.setSelection(selectedFps)
+
+        val bitrateSpinner = android.widget.Spinner(this)
+        bitrateSpinner.adapter = android.widget.ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, bitrates)
+        bitrateSpinner.setSelection(selectedBitrate)
+
+        container.addView(createLabel("VIDEO RESOLUTION"))
+        container.addView(resSpinner)
+        container.addView(createLabel("FRAME RATE"))
+        container.addView(fpsSpinner)
+        container.addView(createLabel("VIDEO BITRATE"))
+        container.addView(bitrateSpinner)
+
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle("Recording Settings")
+            .setView(container)
+            .setPositiveButton("SAVE") { _, _ ->
+                prefs.edit().apply {
+                    putInt("resolution_index", resSpinner.selectedItemPosition)
+                    putInt("fps_index", fpsSpinner.selectedItemPosition)
+                    putInt("bitrate_index", bitrateSpinner.selectedItemPosition)
+                    
+                    // Store actual values for service
+                    putString("resolution", resolutions[resSpinner.selectedItemPosition])
+                    putInt("fps", when(fpsSpinner.selectedItemPosition) {
+                        0 -> 30
+                        1 -> 60
+                        2 -> 90
+                        else -> 120
+                    })
+                    putInt("bitrate", when(bitrateSpinner.selectedItemPosition) {
+                        0 -> 4 * 1024 * 1024
+                        1 -> 8 * 1024 * 1024
+                        2 -> 12 * 1024 * 1024
+                        3 -> 20 * 1024 * 1024
+                        else -> 32 * 1024 * 1024
+                    })
+                    apply()
+                }
+                Toast.makeText(this, "Settings Saved", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("CANCEL", null)
+            .show()
     }
 
     private fun loadBannerAd() {
@@ -398,16 +484,6 @@ class MainActivity : AppCompatActivity() {
         rewardedAd?.let { ad ->
             ad.show(this) { rewardItem ->
                 onReward()
-                
-                val user = auth.currentUser
-                if (user != null) {
-                    db.collection("users").document(user.uid)
-                        .update("isPremium", true, "updatedAt", Date())
-                        .addOnSuccessListener {
-                            isUserPremium = true
-                            Toast.makeText(this, "Profile updated to Premium!", Toast.LENGTH_SHORT).show()
-                        }
-                }
             }
         } ?: run {
             showError("Internal Error: Ad not ready. Please check internet connection or disable ad block.")
