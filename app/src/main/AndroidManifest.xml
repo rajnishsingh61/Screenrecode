@@ -34,12 +34,14 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <!-- Main Screen Recording Service -->
         <service
             android:name=".ScreenRecordService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="mediaProjection" />
 
+        <!-- Floating UI Control Service -->
         <service
             android:name=".FloatingControlService"
             android:enabled="true"
@@ -49,7 +51,7 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-9464901744553188~8262953226" />
 
-        <!-- WorkManager AIDE Fix: Overriding problematic library tags -->
+        <!-- WorkManager Overrides to fix AIDE library manifest errors -->
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
@@ -63,14 +65,14 @@
         <service
             android:name="androidx.work.impl.background.systemalarm.SystemAlarmService"
             android:directBootAware="false"
-            android:enabled="@bool/enable_system_alarm_service_default"
+            android:enabled="true"
             android:exported="false"
             tools:node="replace" />
 
         <service
             android:name="androidx.work.impl.background.systemjob.SystemJobService"
             android:directBootAware="false"
-            android:enabled="@bool/enable_system_job_service_default"
+            android:enabled="true"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE"
             tools:node="replace" />
@@ -78,7 +80,7 @@
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             android:directBootAware="false"
-            android:enabled="@bool/enable_system_foreground_service_default"
+            android:enabled="true"
             android:exported="false"
             tools:node="replace" />
 
@@ -152,7 +154,7 @@
         <receiver
             android:name="androidx.work.impl.background.systemalarm.ConstraintProxyUpdateReceiver"
             android:directBootAware="false"
-            android:enabled="@bool/enable_system_alarm_service_default"
+            android:enabled="true"
             android:exported="false"
             tools:node="replace">
             <intent-filter>
