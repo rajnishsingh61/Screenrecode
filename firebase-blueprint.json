@@ -1,0 +1,58 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User account information for GameRec Pro",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "isPremium": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["uid", "email"]
+    },
+    "AppConfig": {
+      "title": "App Configuration",
+      "type": "object",
+      "properties": {
+        "updateOverlayVisible": { "type": "boolean" },
+        "updateMessage": { "type": "string" },
+        "notificationTitle": { "type": "string" },
+        "notificationBody": { "type": "string" },
+        "overlayAdUrl": { "type": "string" },
+        "overlayAdVisible": { "type": "boolean" },
+        "premiumPrice": { "type": "string" },
+        "qrCodeUrl": { "type": "string" }
+      }
+    },
+    "PremiumRequest": {
+      "title": "Premium Request",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "status": { "type": "string" },
+        "transactionId": { "type": "string" },
+        "createdAt": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "The private profile of each user"
+    },
+    "app_config/settings": {
+      "schema": "AppConfig",
+      "description": "Global application configuration controlled by admin"
+    },
+    "premium_requests/{requestId}": {
+      "schema": "PremiumRequest",
+      "description": "Requests from users to upgrade to premium"
+    }
+  }
+}

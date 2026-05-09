@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <!-- Floating Bubble -->
+    <ImageView
+        android:id="@+id/imgBubble"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@android:drawable/ic_menu_camera"
+        android:padding="12dp"
+        android:background="@drawable/btn_neon_gradient"
+        android:elevation="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_top_toTopOf="parent" />
+
+    <!-- Control Bar -->
+    <LinearLayout
+        android:id="@+id/layoutControlBar"
+        android:layout_width="wrap_content"
+        android:layout_height="56dp"
+        android:layout_marginStart="12dp"
+        android:background="@drawable/bg_glass_card"
+        android:backgroundTint="@color/surface_dark"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/imgBubble"
+        app:layout_constraintStart_toEndOf="@id/imgBubble"
+        app:layout_top_toTopOf="@id/imgBubble">
+
+        <ImageButton
+            android:id="@+id/btnPauseResume"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_media_pause"
+            app:tint="@color/text_high_white" />
+
+        <ImageButton
+            android:id="@+id/btnStopRecord"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="12dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            app:tint="@color/recording_red" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Premium Light Theme -->
+    <color name="bg_light">#F8F9FA</color>
+    <color name="surface_light">#FFFFFF</color>
+    <color name="primary_purple">#A020F0</color>
+    <color name="primary_purple_variant">#7B12FF</color>
+    <color name="accent_blue">#007AFF</color>
+    <color name="accent_cyan">#00C3FF</color>
+    
+    <!-- Status & Semantic -->
+    <color name="recording_red">#FF3B30</color>
+    <color name="success_green">#34C759</color>
+    <color name="warning_amber">#FF9500</color>
+    
+    <!-- Text -->
+    <color name="text_dark">#1C1E21</color>
+    <color name="text_muted">#606770</color>
+    <color name="text_dim">#8D949E</color>
+    
+    <!-- Transparent Accents -->
+    <color name="glass_dark">#0D000000</color>
+    <color name="glass_purple">#1AA020F0</color>
+    
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>

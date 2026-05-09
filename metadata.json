@@ -1,0 +1,6 @@
+{
+  "name": "GameRec Pro",
+  "description": "Professional gaming screen recorder with neon-purple theme, FPS overlay, and RTMP streaming support.",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": []
+}
